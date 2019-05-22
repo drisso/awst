@@ -1,6 +1,49 @@
+#' Asymmetric Within-Sample Transformation
+#'
+#' This function implements the asymmetric within-sample transformation
+#' described in Risso and Pagnotta (2019). The function includes two steps: a
+#' standardization step and a asymmetric winsorization step. See details.
+#'
+#' @details The standardization step is based on a log-normal distribution of
+#'   the high-intensity genes. Optionally, only positive counts can be used in
+#'   this step (this option is especially useful for single-cell data). The
+#'   winsorization step is controlled by two parameters, sigma0 and lambda,
+#'   which control the growth rate of the winsorization function.
+#'
+#' @references Risso and Pagnotta (2019). Within-sample standardization and
+#'   asymmetric winsorization lead to accurate classification of RNA-seq
+#'   expression profiles. Manuscript in preparation.
+#'
+#' @param x a matrix of (possibly normalized) RNA-seq read counts.
+#' @param poscount a logical value indicating whether positive counts only
+#'   should be used for the standardization step.
+#' @param full_quantile a logical value indicating whether the data have been
+#'   normalized with the full-quantile normalization. In this case, computations
+#'   can be sped up.
+#' @param sigma0 a multiplicative constant to be applied to the smoothing
+#'   function.
+#' @param lambda a parameter that controls the growth rate of the smoothing
+#'   function.
+#'
+#' @return a matrix of transformed values.
+#'
+#' @examples
+#' x <- matrix(data = rpois(100, lambda=5), ncol=10, nrow=10)
+#' awst(x)
+#'
+#' @export
+awst <- function(x, poscount = FALSE, full_quantile = FALSE, sigma0 = 0.075,
+                 lambda = 5) {
+  zcount <- score(x, poscount = poscount, full_quantile = full_quantile)
+
+  retval <- ssmooth(zcount, sigma0 = sigma0, lambda = lambda)
+
+  return(retval)
+}
+
 #' @importFrom stats approxfun cov density dnorm fivenum integrate pnorm qnorm
 #'   quantile sd var
-score <- function(x, poscount = FALSE) {
+score <- function(x, poscount = FALSE, full_quantile = FALSE) {
   nr <- nrow(x)
   nc <- ncol(x)
 
