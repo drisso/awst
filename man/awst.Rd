@@ -39,7 +39,7 @@ The standardization step is based on a log-normal distribution of
   which control the growth rate of the winsorization function.
 }
 \examples{
-x <- matrix(data = rnorm(100), ncol=10, nrow=10)
+x <- matrix(data = rpois(100, lambda=5), ncol=10, nrow=10)
 awst(x)
 
 }

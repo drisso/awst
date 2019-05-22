@@ -34,8 +34,8 @@
 #' @export
 awst <- function(x, poscount = FALSE, full_quantile = FALSE, sigma0 = 0.075,
                  lambda = 5) {
-  zcount <- score(x, poscount = poscount, full_quantile = full_quantile)
 
+  zcount <- score(x, poscount = poscount, full_quantile = full_quantile)
   retval <- ssmooth(zcount, sigma0 = sigma0, lambda = lambda)
 
   return(retval)
@@ -56,6 +56,12 @@ score <- function(x, poscount = FALSE, full_quantile = FALSE) {
 
   stats <- cbind(matrix(0, ncol = 3, nrow = nr), percentiles)
   colnames(stats)[1:3] <- c("totalSum", "location", "scale")
+
+  # if(poscount) {
+  #   wd <- log1p(x[x>0])
+  # } else {
+  #   wd <- log1p(x)
+  # }
 
   for(i in 1:nr) {
 
