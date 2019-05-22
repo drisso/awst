@@ -69,37 +69,7 @@ ssmooth <- function(zcount, sigma0 = 0.075, lambda = 5) {
   return(ans)
 }
 
-score_ma <- function(x) {
-  nr <- nrow(x)
-  nc <- ncol(x)
-
-  pprobs <- c(0.005, 0.01, 0.025, 0.05, 0.075)
-  q_norm <- qnorm(1-pprobs)
-  var_q_norm <- var(q_norm)
-  mean_q_norm <- mean(q_norm)
-
-  stats <- matrix(0, ncol = 4, nrow = nr)
-  colnames(stats) <- c("mean", "std", "location", "scale")
-  rownames(stats) <- rownames(x)
-  stats[, "mean"] <- rowSums(x)/nc
-  stats[, "std"] <- apply(x, 1 , sd)
-
-  for(i in 1:nr) {
-    q_hat <- -quantile(-log(x[i,]), probs = pprobs)
-    ssd_ <- cov(q_hat, q_norm)/var_q_norm
-    log_center <- mean(q_hat) - mean_q_norm * ssd_
-
-    exp_log_center <- exp(log_center)
-    scale_ <- sqrt((exp(ssd_^2) - 1) * exp(2 * log_center + ssd_^2))
-
-    x[i,] <- (x[i,] - exp_log_center)/scale_
-    stats[i, "location"] <- exp_log_center
-    stats[i, "scale"] <- scale_
-  }
-  attr(x, "stats") <- stats
-  return(x)
-}
-
+## unificare con score()
 score_TPM <- function(x) {
   nr <- nrow(x)
   nc <- ncol(x)
