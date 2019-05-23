@@ -25,7 +25,8 @@
 #' @param lambda a parameter that controls the growth rate of the smoothing
 #'   function.
 #'
-#' @return a matrix of transformed values.
+#' @return a matrix of transformed values, with genes in columns and samples in
+#'   row, ready to be used in distance functions.
 #'
 #' @examples
 #' x <- matrix(data = rpois(100, lambda=5), ncol=10, nrow=10)
@@ -44,52 +45,32 @@ awst <- function(x, poscount = FALSE, full_quantile = FALSE, sigma0 = 0.075,
 #' @importFrom stats approxfun cov density dnorm fivenum integrate pnorm qnorm
 #'   quantile sd var
 score <- function(x, poscount = FALSE, full_quantile = FALSE) {
-  nr <- nrow(x)
-  nc <- ncol(x)
 
-  pp <- c(0.001, 0.005, 0.01, 0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95,
-          0.975, 0.99, 0.999)
-  qq <- qnorm(pp)
-  percentiles <- matrix(0, ncol = length(pp), nrow = nr)
-  colnames(percentiles) <- paste0(round(100*pp, 1), "%")
-  rownames(percentiles) <- rownames(x)
-
-  stats <- cbind(matrix(0, ncol = 3, nrow = nr), percentiles)
-  colnames(stats)[1:3] <- c("totalSum", "location", "scale")
-
-  # if(poscount) {
-  #   wd <- log1p(x[x>0])
-  # } else {
-  #   wd <- log1p(x)
-  # }
-
-  for(i in 1:nr) {
-
-    wd <- x[i,]
-    if(poscount) {
-      wd <- log(1 + wd[wd > 0])
-    } else {
-      wd <- log(1 + wd)
-    }
-
-    d <- density(wd, n = 1000)
-    ccenter <- (d$x[d$x > 1])[which.max(d$y[d$x > 1])]
-    wd <- wd - ccenter
-    tmp <- wd[wd > 0]
-    tmp <- c(tmp, -tmp)
-    sigma2 <- var(tmp)
-    tau <- sqrt((exp(sigma2) - 1) * exp(2*ccenter + sigma2))
-    stats[i, 1:3] <- floor(c(sum(x[i,]), exp(ccenter), tau))
-    x[i,] <- (x[i,] - exp(ccenter))/tau
-
-    pcts <- exp(ccenter + sd(tmp) * qq)
-    stats[i, 4:ncol(stats)] <- floor(pcts)
-    percentiles[i,] <- (pcts - exp(ccenter))/tau
+  if(poscount) {
+    wd <- matrix(log1p(x[x>0]), nrow = nrow(x), ncol=ncol(x))
+  } else {
+    wd <- log1p(x)
   }
 
-  attr(x, "stats") <- stats
-  attr(x, "percentiles") <- percentiles
-  return(x)
+  if(full_quantile) {
+
+    ccenter <- .compute_center(wd[,1])
+    tau <- .compute_tau(wd[,1], ccenter)
+    retval <- t((x - exp(ccenter))/tau)
+
+  } else {
+
+    ccenter <- apply(wd, 2, .compute_center)
+    tau <- lapply(1:NCOL(wd), function(i) {
+      .compute_tau(wd[,i], ccenter[i])
+    })
+    tau <- simplify2array(tau)
+
+    retval <- (t(x) - exp(ccenter))/tau
+
+  }
+
+  return(retval)
 }
 
 ssmooth <- function(zcount, sigma0 = 0.075, lambda = 5) {
@@ -112,43 +93,32 @@ ssmooth <- function(zcount, sigma0 = 0.075, lambda = 5) {
   rownames(ans) <- rownames(zcount)
 
   ### finalizing
-  attr(ans, "stats") <- attr(zcount, "stats")
-  attr(ans, "percentiles") <- attr(zcount, "percentiles")
   attr(ans, "lambda") <- lambda
   return(ans)
 }
 
-## unificare con score()
-score_TPM <- function(x) {
-  nr <- nrow(x)
-  nc <- ncol(x)
-  pp <- c(0.001, 0.005, 0.01, 0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95,
-          0.975, 0.99, 0.999)
-  qq <- qnorm(pp)
-  percentiles <- matrix(0, ncol = length(pp), nrow = nr)
-  colnames(percentiles) <- paste0(round(100*pp, 1), "%")
-  rownames(percentiles) <- rownames(x)
-  stats <- cbind(matrix(0, ncol = 3, nrow = nr), percentiles)
-  colnames(stats)[1:3] <- c("totalSum", "location", "scale")
+.one_sample <- function(wd, x) {
+  d <- density(wd, n = 1000)
+  ccenter <- (d$x[d$x > 1])[which.max(d$y[d$x > 1])]
+  wd <- wd - ccenter
+  tmp <- wd[wd > 0]
+  tmp <- c(tmp, -tmp)
+  sigma2 <- var(tmp)
+  tau <- sqrt((exp(sigma2) - 1) * exp(2*ccenter + sigma2))
 
-  for(i in 1:nr) {
-    wd <- log(x[i, which(x[i,] > 0)])
-    d <- density(wd[wd>0], n = 1000)
+  return((x - exp(ccenter))/tau)
+}
 
-    ccenter <- (d$x)[which.max(d$y)]
-    wd <- wd - ccenter
-    tmp <- wd[wd > 0]
-    tmp <- c(tmp, -tmp)
-    ssd <- sqrt((exp(sd(tmp)^2)-1)*exp(2*ccenter))
-    stats[i, 1:3] <- floor(c(sum(x[i,]), exp(ccenter), ssd))
-    x[i,] <- (x[i,] - exp(ccenter))/ssd
+.compute_center <- function(x, n = 1000) {
+  d <- density(x, n = n)
+  ccenter <- (d$x[d$x > 1])[which.max(d$y[d$x > 1])]
+  return(ccenter)
+}
 
-    pcts <- exp(ccenter + sd(tmp) * qq)
-    stats[i, 4:ncol(stats)] <- floor(pcts)
-    percentiles[i,] <- (pcts - exp(ccenter))/ssd
-  }
-
-  attr(x, "stats") <- stats
-  attr(x, "percentiles") <- percentiles
-  return(x)
+.compute_tau <- function(wd, ccenter) {
+  wd <- wd - ccenter
+  tmp <- wd[wd > 0]
+  tmp <- c(tmp, -tmp)
+  sigma2 <- var(tmp)
+  tau <- sqrt((exp(sigma2) - 1) * exp(2*ccenter + sigma2))
 }

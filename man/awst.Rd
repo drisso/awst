@@ -24,7 +24,8 @@ function.}
 function.}
 }
 \value{
-a matrix of transformed values.
+a matrix of transformed values, with genes in columns and samples in
+  row, ready to be used in distance functions.
 }
 \description{
 This function implements the asymmetric within-sample transformation
