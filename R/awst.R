@@ -42,7 +42,7 @@ awst <- function(x, poscount = FALSE, full_quantile = FALSE, sigma0 = 0.075,
   return(retval)
 }
 
-#' @importFrom stats approxfun cov density dnorm fivenum integrate pnorm qnorm
+#' @importFrom stats approxfun cov density dnorm integrate pnorm qnorm
 #'   quantile sd var
 score <- function(x, poscount = FALSE, full_quantile = FALSE) {
 
@@ -87,7 +87,6 @@ ssmooth <- function(zcount, sigma0 = 0.075, lambda = 5) {
   ### exprData
   f <- approxfun(xx[-1], YY, yleft = 0, yright = 1)
   ans <- apply(zcount, 2, f)
-  (fivenum(ans))
   (tmp <- YY[which(xx > 0)[1]])
   ans <- 2 * (ans - tmp)/tmp
   rownames(ans) <- rownames(zcount)
