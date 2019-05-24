@@ -26,9 +26,8 @@ shannon.tt <- function(tt, normalized = TRUE) {
   tt[tt == 0] <- 1
   ans <- -sum(tt * log2(tt))
   if (normalized) {
-    tmp <- rep(1/length(tt), length(tt))
-    tmp <- -sum(tmp * log2(tmp))
-    return(ans/tmp)
+    return(ans/log2(length(tt)))
+  } else {
+    return(ans)
   }
-  else return(ans)
 }
