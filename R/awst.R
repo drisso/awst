@@ -46,23 +46,17 @@ awst <- function(x, poscount = FALSE, full_quantile = FALSE, sigma0 = 0.075,
 #'   quantile sd var
 score <- function(x, poscount = FALSE, full_quantile = FALSE) {
 
-  if(poscount) {
-    wd <- matrix(log1p(x[x>0]), nrow = nrow(x), ncol=ncol(x))
-  } else {
-    wd <- log1p(x)
-  }
-
   if(full_quantile) {
 
-    ccenter <- .compute_center(wd[,1])
-    tau <- .compute_tau(wd[,1], ccenter)
+    ccenter <- .compute_center(x[,1], poscount = poscount)
+    tau <- .compute_tau(x[,1], ccenter, poscount = poscount)
     retval <- t((x - exp(ccenter))/tau)
 
   } else {
 
-    ccenter <- apply(wd, 2, .compute_center)
-    tau <- lapply(1:NCOL(wd), function(i) {
-      .compute_tau(wd[,i], ccenter[i])
+    ccenter <- apply(x, 2, .compute_center, poscount = poscount)
+    tau <- lapply(1:NCOL(x), function(i) {
+      .compute_tau(x[,i], ccenter[i], poscount = poscount)
     })
     tau <- simplify2array(tau)
 
@@ -96,25 +90,27 @@ ssmooth <- function(zcount, sigma0 = 0.075, lambda = 5) {
   return(ans)
 }
 
-.one_sample <- function(wd, x) {
-  d <- density(wd, n = 1000)
-  ccenter <- (d$x[d$x > 1])[which.max(d$y[d$x > 1])]
-  wd <- wd - ccenter
-  tmp <- wd[wd > 0]
-  tmp <- c(tmp, -tmp)
-  sigma2 <- var(tmp)
-  tau <- sqrt((exp(sigma2) - 1) * exp(2*ccenter + sigma2))
+.compute_center <- function(x, poscount = FALSE, n = 1000) {
 
-  return((x - exp(ccenter))/tau)
-}
+  if(poscount) {
+    wd <- log1p(x[x>0])
+  } else {
+    wd <- log1p(x)
+  }
 
-.compute_center <- function(x, n = 1000) {
-  d <- density(x, n = n)
+  d <- density(wd, n = n)
   ccenter <- (d$x[d$x > 1])[which.max(d$y[d$x > 1])]
   return(ccenter)
 }
 
-.compute_tau <- function(wd, ccenter) {
+.compute_tau <- function(x, ccenter, poscount = FALSE) {
+
+  if(poscount) {
+    wd <- log1p(x[x>0])
+  } else {
+    wd <- log1p(x)
+  }
+
   wd <- wd - ccenter
   tmp <- wd[wd > 0]
   tmp <- c(tmp, -tmp)
