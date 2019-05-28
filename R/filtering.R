@@ -1,14 +1,15 @@
 #' @export
-gene_filter <- function(exprData, nBins = 20, shannon_cutoff = 0.1) {
+gene_filter <- function(exprData, from = min(exprData), to = max(exprData),
+                        nBins = 20, heterogeneity_threshold = 0.1) {
 
-  bbreaks <- seq(from = min(exprData), to = max(exprData), length.out = nBins + 1)
-  halfDelta <- (bbreaks[2] - bbreaks[1])/2
+  bbreaks <- seq(from = from, to = to, length.out = nBins + 1)
+  classes <- names(table(cut(exprData[1, ], breaks = bbreaks, include.lowest = TRUE)))
+
   ddata_cut <- apply(exprData, 1, cut, breaks = bbreaks, include.lowest = TRUE)
   rownames(ddata_cut) <- colnames(exprData)
 
-  tt <- unique(as.vector(ddata_cut))
-  ttable <- matrix(0, nrow = ncol(exprData), ncol = length(tt))
-  colnames(ttable) <- tt
+  ttable <- matrix(0, nrow = ncol(exprData), ncol = nBins)
+  colnames(ttable) <- classes
   rownames(ttable) <- colnames(exprData)
 
   for(k in seq_len(nrow(ddata_cut))) {
@@ -16,18 +17,19 @@ gene_filter <- function(exprData, nBins = 20, shannon_cutoff = 0.1) {
     ttable[k, names(tt)] <- tt
   }
 
-  tmp <- apply(ttable, 1, shannon.tt)
-  which_genes <- which(tmp > shannon_cutoff)
-  return(exprData[, which_genes])
+  tmp <- apply(ttable, 1, heterogeneity, nBins = nBins)
+  noisy_features <- which(tmp < heterogeneity_threshold)
+  ans <- exprData[, -noisy_features]
+  attr(ans, "breaks") <- bbreaks
+  attr(ans, "noisy_features") <- names(noisy_features)
+  return(ans)
 }
 
-shannon.tt <- function(tt, normalized = TRUE) {
-  tt <- tt/sum(tt)
-  tt[tt == 0] <- 1
-  ans <- -sum(tt * log2(tt))
-  if (normalized) {
-    return(ans/log2(length(tt)))
-  } else {
-    return(ans)
-  }
+heterogeneity <- function(empirical_probabilities, nBins = nBins) {
+  # Shannon's entropy
+  empirical_probabilities <- empirical_probabilities/sum(empirical_probabilities)
+  empirical_probabilities[empirical_probabilities == 0] <- 1
+  ans <- -sum(empirical_probabilities * log2(empirical_probabilities))
+  ans <- ans/log2(nBins)
+  return(ans)
 }
