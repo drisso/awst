@@ -14,3 +14,16 @@ test_that("function gives consistent results", {
   expect_true(max(abs(retval - old_retval)) < 1e-5)
 })
 
+test_that("filtering gives consistent results", {
+  mat <- matrix(data = c(-2, -2, 2.614586, -2, 2.541772,
+                                2.395290, 2.253305, 2.391610, -2, -1.824604,
+                                -2, -2, -1.999993, -1.867436, 2.596351,
+                                -2, 2.662462, -1.999993, -2, -1.824604,
+                                -2, -1.991209, -1.999993, -2, -1.824604),
+                       nrow = 5, ncol = 5)
+
+  old_retval <- mat[,1:4]
+
+  filtered <- gene_filter(mat)
+  expect_true(max(abs(filtered - old_retval)) < 1e-5)
+})
