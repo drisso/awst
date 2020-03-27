@@ -4,8 +4,13 @@
 \alias{gene_filter}
 \title{Gene filtering based on heterogeneity}
 \usage{
-gene_filter(x, from = min(x), to = max(x), nBins = 20,
-  heterogeneity_threshold = 0.1)
+gene_filter(
+  x,
+  from = min(x),
+  to = max(x),
+  nBins = 20,
+  heterogeneity_threshold = 0.1
+)
 }
 \arguments{
 \item{x}{a matrix of transformed gene expression counts (typically the

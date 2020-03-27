@@ -34,7 +34,7 @@
 #'
 #' @export
 awst <- function(x, poscount = FALSE, full_quantile = FALSE, sigma0 = 0.075,
-                 lambda = 5) {
+                 lambda = 13) {
 
   zcount <- score(x, poscount = poscount, full_quantile = full_quantile)
   retval <- ssmooth(zcount, sigma0 = sigma0, lambda = lambda)
@@ -67,7 +67,7 @@ score <- function(x, poscount = FALSE, full_quantile = FALSE) {
   return(retval)
 }
 
-ssmooth <- function(zcount, sigma0 = 0.075, lambda = 5) {
+ssmooth <- function(zcount, sigma0 = 0.075, lambda = 13) {
   ### distribution
   ssigma <- function(z) return(1 + ifelse(z > 0, 2*lambda*(pnorm(z)-.5), 0))
   foo <- function(z, sigma = sigma0)  return(dnorm(z, sd = sigma * ssigma(z)))

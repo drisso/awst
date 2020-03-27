@@ -4,8 +4,7 @@
 \alias{awst}
 \title{Asymmetric Within-Sample Transformation}
 \usage{
-awst(x, poscount = FALSE, full_quantile = FALSE, sigma0 = 0.075,
-  lambda = 5)
+awst(x, poscount = FALSE, full_quantile = FALSE, sigma0 = 0.075, lambda = 13)
 }
 \arguments{
 \item{x}{a matrix of (possibly normalized) RNA-seq read counts.}
