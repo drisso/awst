@@ -11,3 +11,14 @@ The easiest way to install the package is the following.
 install.packages("remotes")
 remotes::install_github("drisso/awst")
 ```
+
+## Usage
+
+The AWST transformation can be applied either directly on raw counts, or (recommended) to normalized counts. The input should be a matrix with genes in rows and samples in columns.
+
+```{r}
+library(awst)
+xt <- awst(x)
+```
+
+For detailed examples and use cases see https://github.com/drisso/awst_analysis.
