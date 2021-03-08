@@ -27,3 +27,14 @@ test_that("filtering gives consistent results", {
   filtered <- gene_filter(mat)
   expect_true(max(abs(filtered - old_retval)) < 1e-5)
 })
+
+test_that("full-quantile version gives consistent results", {
+
+  library(EDASeq)
+  x <- t(matrix(rpois(25, lambda=5), ncol=5, nrow=5))
+  fq <- betweenLaneNormalization(x, which="full")
+  retval1 <- awst(fq)
+  retval2 <- awst(fq, full_quantile=TRUE)
+  expect_equal(retval1, retval2)
+
+})
