@@ -10,7 +10,7 @@ test_that("function gives consistent results", {
 
   set.seed(222)
   x <- t(matrix(rpois(25, lambda=5), ncol=5, nrow=5))
-  retval <- awst(x)
+  retval <- awst(x, lambda = 5)
   expect_true(max(abs(retval - old_retval)) < 1e-5)
 })
 
