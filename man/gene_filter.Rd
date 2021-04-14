@@ -26,7 +26,7 @@ results of \code{\link{awst}}).}
 }
 \value{
 a matrix of transformed values, with genes in columns and samples in
-  row, ready to be used in distance functions.
+   row, ready to be used in distance functions.
 }
 \description{
 This function filters out genes that show a low heterogeneity, as measured by
@@ -34,9 +34,9 @@ Shannon's entropy.
 }
 \details{
 Shannon's entropy is computed on the categorized data after AWST
-  transformation. Those genes that show a lower entropy than the predefined
-  threshold are deemed to carry too low information to be useful for the
-  classification of the samples, and are hence removed.
+   transformation. Those genes that show a lower entropy than the predefined
+   threshold are deemed to carry too low information to be useful for the
+   classification of the samples, and are hence removed.
 }
 \examples{
 set.seed(222)
@@ -47,6 +47,6 @@ gene_filter(a)
 }
 \references{
 Risso and Pagnotta (2019). Within-sample standardization and
-  asymmetric winsorization lead to accurate classification of RNA-seq
-  expression profiles. Manuscript in preparation.
+   asymmetric winsorization lead to accurate classification of RNA-seq
+   expression profiles. Manuscript in preparation.
 }

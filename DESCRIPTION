@@ -3,18 +3,19 @@ Title: Asymmetric Within-Sample Transformation
 Version: 0.99.0
 Authors@R: 
     c(person(given = "Davide",
-           family = "Risso",
-           role = c("aut", "cre", "cph"),
-           email = "risso.davide@gmail.com",
-           comment = c(ORCID = "0000-0001-8508-5012")),
-      person(given = "Stefano",
-           family = "Pagnotta",
-           role = c("aut", "cph"),
-           email = "smpagnotta@gmail.com",
-           comment = c(ORCID = "0000-0002-8298-9777")))
-Description: We propose an Asymmetric Within-Sample Transformation (AWST) 
-             to regularize RNA-seq read counts and reduce the effect of noise
-             on the classification of samples.
+                family = "Risso",
+                role = c("aut", "cre", "cph"),
+                email = "risso.davide@gmail.com",
+                comment = c(ORCID = "0000-0001-8508-5012")),
+        person(given = "Stefano",
+               family = "Pagnotta",
+               role = c("aut", "cph"),
+               email = "smpagnotta@gmail.com",
+               comment = c(ORCID = "0000-0002-8298-9777")))
+Description:
+    We propose an Asymmetric Within-Sample Transformation (AWST) 
+    to regularize RNA-seq read counts and reduce the effect of noise
+    on the classification of samples.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

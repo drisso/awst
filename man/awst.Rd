@@ -13,8 +13,8 @@ awst(x, poscount = FALSE, full_quantile = FALSE, sigma0 = 0.075, lambda = 13)
 should be used for the standardization step.}
 
 \item{full_quantile}{a logical value indicating whether the data have been
-normalized with the full-quantile normalization. In this case, computations
-can be sped up.}
+normalized with the full-quantile normalization. In this case,
+computations can be sped up.}
 
 \item{sigma0}{a multiplicative constant to be applied to the smoothing
 function.}
@@ -24,7 +24,7 @@ function.}
 }
 \value{
 a matrix of transformed values, with genes in columns and samples in
-  row, ready to be used in distance functions.
+   row, ready to be used in distance functions.
 }
 \description{
 This function implements the asymmetric within-sample transformation
@@ -33,10 +33,10 @@ standardization step and a asymmetric winsorization step. See details.
 }
 \details{
 The standardization step is based on a log-normal distribution of
-  the high-intensity genes. Optionally, only positive counts can be used in
-  this step (this option is especially useful for single-cell data). The
-  winsorization step is controlled by two parameters, sigma0 and lambda,
-  which control the growth rate of the winsorization function.
+   the high-intensity genes. Optionally, only positive counts can be used in
+   this step (this option is especially useful for single-cell data). The
+   winsorization step is controlled by two parameters, sigma0 and lambda,
+   which control the growth rate of the winsorization function.
 }
 \examples{
 x <- matrix(data = rpois(100, lambda=5), ncol=10, nrow=10)
@@ -45,6 +45,6 @@ awst(x)
 }
 \references{
 Risso and Pagnotta (2019). Within-sample standardization and
-  asymmetric winsorization lead to accurate classification of RNA-seq
-  expression profiles. Manuscript in preparation.
+   asymmetric winsorization lead to accurate classification of RNA-seq
+   expression profiles. Manuscript in preparation.
 }

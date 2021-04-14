@@ -57,8 +57,8 @@ bib <- c(
 
 ```{r "install", eval = FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE)) {
-      install.packages("BiocManager")
-  }
+    install.packages("BiocManager")
+}
 
 BiocManager::install("awst")
 
@@ -141,7 +141,7 @@ We can see how the `awst` transformation leads to separation between treatment (
 res_pca <- prcomp(res_awst)
 df <- as.data.frame(cbind(res_pca$x, colData(airway)))
 ggplot(df, aes(x = PC1, y = PC2, color = dex, shape = cell)) +
-  geom_point() + theme_classic()
+    geom_point() + theme_classic()
 ```
 
 # Role of normalization
@@ -157,7 +157,7 @@ res_full <- awst(fq)
 res_pca <- prcomp(res_full)
 df <- as.data.frame(cbind(res_pca$x, colData(airway)))
 ggplot(df, aes(x = PC1, y = PC2, color = dex, shape = cell)) +
-  geom_point() + theme_classic()
+    geom_point() + theme_classic()
 ```
 
 # Reproducibility
