@@ -6,8 +6,8 @@
 \usage{
 gene_filter(
   x,
-  from = min(x),
-  to = max(x),
+  from = min(x, na.rm = TRUE),
+  to = max(x, na.rm = TRUE),
   nBins = 20,
   heterogeneity_threshold = 0.1
 )

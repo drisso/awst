@@ -29,7 +29,8 @@
 #' gene_filter(a)
 #'
 #' @export
-gene_filter <- function(x, from = min(x), to = max(x),
+gene_filter <- function(x, from = min(x, na.rm = TRUE),
+                        to = max(x, na.rm = TRUE),
                         nBins = 20, heterogeneity_threshold = 0.1) {
 
   bbreaks <- seq(from = from, to = to, length.out = nBins + 1)
