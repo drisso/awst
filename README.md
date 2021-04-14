@@ -1,7 +1,12 @@
 # awst
+
+<!-- badges: start -->
+[![R-CMD-check-bioc](https://github.com/drisso/awst/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/drisso/awst/actions)
+<!-- badges: end -->
+
 Asymmetric Winsorization per Sample Transformation
 
-This package implements the AWST method presented in Risso and Pagnotta (2020).
+This package implements the AWST method presented in [Risso and Pagnotta (2020)](https://doi.org/10.1101/2020.06.04.134916).
 
 ## Installation
 
