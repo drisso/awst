@@ -1,6 +1,6 @@
 Package: awst
 Title: Asymmetric Within-Sample Transformation
-Version: 0.0.4
+Version: 0.99.0
 Authors@R: 
     c(person(given = "Davide",
            family = "Risso",
@@ -18,9 +18,28 @@ Description: We propose an Asymmetric Within-Sample Transformation (AWST)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
 URL: https://github.com/drisso/awst
 BugReports: https://github.com/drisso/awst/issues
+Imports:
+    stats  
 Suggests: 
+    airway,
+    SummarizedExperiment,
+    ggplot2,
     testthat,
-    EDASeq
+    EDASeq,
+    knitr,
+    BiocStyle,
+    RefManageR,
+    sessioninfo,
+    rmarkdown
+biocViews:
+    Normalization,
+    GeneExpression,
+    RNASeq,
+    Software,
+    Transcriptomics,
+    Sequencing,
+    SingleCell
+VignetteBuilder: knitr
