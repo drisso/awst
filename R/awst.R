@@ -14,7 +14,8 @@
 #'    asymmetric winsorization lead to accurate classification of RNA-seq
 #'    expression profiles. Manuscript in preparation.
 #'
-#' @param x a matrix of (possibly normalized) RNA-seq read counts.
+#' @param x a matrix of (possibly normalized) RNA-seq read counts or a
+#'   `SummarizedExperiment`.
 #' @param poscount a logical value indicating whether positive counts only
 #'    should be used for the standardization step.
 #' @param full_quantile a logical value indicating whether the data have been
@@ -25,22 +26,63 @@
 #' @param lambda a parameter that controls the growth rate of the smoothing
 #'    function.
 #'
-#' @return a matrix of transformed values, with genes in columns and samples in
-#'    row, ready to be used in distance functions.
+#' @return if `x` is a matrix, it returns a matrix of transformed values, with
+#'   genes in rows and samples in column. If `x` is a `SummarizedExperiment`, it
+#'   returns a `SummarizedExperiment` with the transformed value in the `name`
+#'   slot.
 #'
 #' @examples
 #' x <- matrix(data = rpois(100, lambda=5), ncol=10, nrow=10)
 #' awst(x)
 #'
+#' @import methods
 #' @export
-awst <- function(x, poscount = FALSE, full_quantile = FALSE, sigma0 = 0.075,
-                    lambda = 13) {
+#' @name awst
+NULL
 
-    zcount <- score(x, poscount = poscount, full_quantile = full_quantile)
-    retval <- ssmooth(zcount, sigma0 = sigma0, lambda = lambda)
+#' @export
+setGeneric("awst", function(x, ...) standardGeneric("awst"))
 
-    return(retval)
-}
+#' @export
+#' @describeIn awst the input is a matrix of (possibly normalized) counts
+setMethod("awst", "matrix",
+          function(x,
+                   poscount = FALSE,
+                   full_quantile = FALSE,
+                   sigma0 = 0.075,
+                   lambda = 13) {
+
+              zcount <- score(x, poscount = poscount, full_quantile = full_quantile)
+              retval <- ssmooth(zcount, sigma0 = sigma0, lambda = lambda)
+
+              return(t(retval))
+})
+
+#' @export
+#' @import SummarizedExperiment
+#' @describeIn awst the input is a SummarizedExperiment with (possibly
+#'   normalized) counts in one of its assays.
+#' @param expr_values integer scalar or string indicating the assay that
+#'   contains the matrix to use as input.
+#' @param name string specifying the name of the assay to be used to store the
+#'   results of the transformation.
+setMethod("awst", "SummarizedExperiment",
+          function(x,
+                   poscount = FALSE,
+                   full_quantile = FALSE,
+                   sigma0 = 0.075,
+                   lambda = 13,
+                   expr_values = "counts",
+                   name = "awst") {
+
+              assay(x, name) <- awst(assay(x, expr_values),
+                                     poscount = poscount,
+                                     full_quantile = full_quantile,
+                                     sigma0 = sigma0,
+                                     lambda = lambda)
+
+              return(x)
+})
 
 #' @importFrom stats approxfun cov density dnorm integrate pnorm qnorm
 #'    quantile sd var
@@ -66,6 +108,7 @@ score <- function(x, poscount = FALSE, full_quantile = FALSE) {
 
     return(retval)
 }
+
 
 ssmooth <- function(zcount, sigma0 = 0.075, lambda = 13) {
     ### distribution

@@ -2,12 +2,25 @@
 % Please edit documentation in R/awst.R
 \name{awst}
 \alias{awst}
+\alias{awst,matrix-method}
+\alias{awst,SummarizedExperiment-method}
 \title{Asymmetric Within-Sample Transformation}
 \usage{
-awst(x, poscount = FALSE, full_quantile = FALSE, sigma0 = 0.075, lambda = 13)
+\S4method{awst}{matrix}(x, poscount = FALSE, full_quantile = FALSE, sigma0 = 0.075, lambda = 13)
+
+\S4method{awst}{SummarizedExperiment}(
+  x,
+  poscount = FALSE,
+  full_quantile = FALSE,
+  sigma0 = 0.075,
+  lambda = 13,
+  expr_values = "counts",
+  name = "awst"
+)
 }
 \arguments{
-\item{x}{a matrix of (possibly normalized) RNA-seq read counts.}
+\item{x}{a matrix of (possibly normalized) RNA-seq read counts or a
+`SummarizedExperiment`.}
 
 \item{poscount}{a logical value indicating whether positive counts only
 should be used for the standardization step.}
@@ -21,10 +34,18 @@ function.}
 
 \item{lambda}{a parameter that controls the growth rate of the smoothing
 function.}
+
+\item{expr_values}{integer scalar or string indicating the assay that
+contains the matrix to use as input.}
+
+\item{name}{string specifying the name of the assay to be used to store the
+results of the transformation.}
 }
 \value{
-a matrix of transformed values, with genes in columns and samples in
-   row, ready to be used in distance functions.
+if `x` is a matrix, it returns a matrix of transformed values, with
+  genes in rows and samples in column. If `x` is a `SummarizedExperiment`, it
+  returns a `SummarizedExperiment` with the transformed value in the `name`
+  slot.
 }
 \description{
 This function implements the asymmetric within-sample transformation
@@ -38,6 +59,14 @@ The standardization step is based on a log-normal distribution of
    winsorization step is controlled by two parameters, sigma0 and lambda,
    which control the growth rate of the winsorization function.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{matrix}: the input is a matrix of (possibly normalized) counts
+
+\item \code{SummarizedExperiment}: the input is a SummarizedExperiment with (possibly
+normalized) counts in one of its assays.
+}}
+
 \examples{
 x <- matrix(data = rpois(100, lambda=5), ncol=10, nrow=10)
 awst(x)
