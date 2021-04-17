@@ -2,14 +2,25 @@
 % Please edit documentation in R/filtering.R
 \name{gene_filter}
 \alias{gene_filter}
+\alias{gene_filter,matrix-method}
+\alias{gene_filter,SummarizedExperiment-method}
 \title{Gene filtering based on heterogeneity}
 \usage{
-gene_filter(
+\S4method{gene_filter}{matrix}(
   x,
   from = min(x, na.rm = TRUE),
   to = max(x, na.rm = TRUE),
   nBins = 20,
   heterogeneity_threshold = 0.1
+)
+
+\S4method{gene_filter}{SummarizedExperiment}(
+  x,
+  from = min(assay(x, awst_values), na.rm = TRUE),
+  to = max(assay(x, awst_values), na.rm = TRUE),
+  nBins = 20,
+  heterogeneity_threshold = 0.1,
+  awst_values = "awst"
 )
 }
 \arguments{
@@ -23,10 +34,13 @@ results of \code{\link{awst}}).}
 \item{nBins}{the number of bins.}
 
 \item{heterogeneity_threshold}{the trheshold used for the filtering.}
+
+\item{awst_values}{integer scalar or string indicating the assay that
+contains the awst-transformed values to use as input.}
 }
 \value{
-a matrix of transformed values, with genes in columns and samples in
-   row, ready to be used in distance functions.
+if `x` is a matrix, it returns a filtered matrix. If `x` is a
+  `SummarizedExperiment`, it returns a filtered `SummarizedExperiment`
 }
 \description{
 This function filters out genes that show a low heterogeneity, as measured by
@@ -38,6 +52,14 @@ Shannon's entropy is computed on the categorized data after AWST
    threshold are deemed to carry too low information to be useful for the
    classification of the samples, and are hence removed.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{matrix}: the input is a matrix of awst-transformed values.
+
+\item \code{SummarizedExperiment}: the input is a SummarizedExperiment with
+awst-transformed values in one of its assays.
+}}
+
 \examples{
 set.seed(222)
 x <- matrix(rpois(75, lambda=5), ncol=5, nrow=15)
