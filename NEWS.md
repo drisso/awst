@@ -1,4 +1,4 @@
-# awst 0.99.0
+# awst 0.99.1
 
 NEW FEATURES
 
