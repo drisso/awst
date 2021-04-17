@@ -2,6 +2,10 @@
 
 export(awst)
 export(gene_filter)
+exportMethods(awst)
+exportMethods(gene_filter)
+import(SummarizedExperiment)
+import(methods)
 importFrom(stats,approxfun)
 importFrom(stats,cov)
 importFrom(stats,density)

@@ -10,7 +10,7 @@ test_that("function gives consistent results", {
 
     set.seed(222)
     x <- t(matrix(rpois(25, lambda=5), ncol=5, nrow=5))
-    retval <- awst(x, lambda = 5)
+    retval <- t(awst(x, lambda = 5))
     expect_true(max(abs(retval - old_retval)) < 1e-5)
 })
 
@@ -24,8 +24,8 @@ test_that("filtering gives consistent results", {
 
     old_retval <- mat[,1:4]
 
-    filtered <- gene_filter(mat)
-    expect_true(max(abs(filtered - old_retval)) < 1e-5)
+    filtered <- gene_filter(t(mat))
+    expect_true(max(abs(t(filtered) - old_retval)) < 1e-5)
 })
 
 test_that("full-quantile version gives consistent results", {
@@ -37,4 +37,30 @@ test_that("full-quantile version gives consistent results", {
     retval2 <- awst(fq, full_quantile=TRUE)
     expect_equal(retval1, retval2)
 
+})
+
+test_that("SummarizedExperiment and matrix methods give consistent results", {
+    library(SummarizedExperiment)
+    x <- t(matrix(rpois(25, lambda=5), ncol=5, nrow=5))
+    se <- SummarizedExperiment(assays = list(counts = x))
+
+    a <- awst(x)
+    se <- awst(se)
+
+    expect_equal(a, assay(se, "awst"))
+
+    b <- gene_filter(a)
+    c <- gene_filter(se)
+
+    expect_equal(nrow(b), nrow(c))
+})
+
+test_that("SummarizedExperiment method works with non-default assays", {
+    x <- t(matrix(rpois(25, lambda=5), ncol=5, nrow=5))
+    se <- SummarizedExperiment(assays = list(counts = x, norm_counts = x))
+
+    se <- awst(se)
+    se <- awst(se, expr_values = "norm_counts", name = "awst2")
+
+    expect_equal(assay(se, "awst"), assay(se, "awst2"))
 })

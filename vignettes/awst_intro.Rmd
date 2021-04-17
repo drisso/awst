@@ -85,6 +85,14 @@ We hope that `r Biocpkg("awst")` will be useful for your research. Please use th
 citation("awst")
 ```
 
+# What does `awst` does?
+
+AWST aims to regularize the original read counts to reduce the effect of noise on the clustering of samples. In fact, gene expression data are characterized by high levels of noise in both lowly expressed features, which suffer from background effects and low signal-to-noise ratio, and highly expressed features, which may be the result of amplification bias and other experimental artifacts. These effects are of utmost importance in highly degraded or low input material samples, such as tumor samples and single cells.
+
+AWST comprises two main steps. In the first one, namely the standardization step, we standardize the counts by centering and scaling them, exploiting the log-normal probability distribution. We refer to the standardized counts as z-counts. The second step, namely the smoothing step, leverages a highly skewed transformation that decreases the noise while preserving the influence of genes to separate molecular subtypes. These two steps are implemented in the `awst` function.
+
+A further filtering method, implemented in the `gene_filter` function, is suggested to remove those features that only contribute noise to the clustering.
+
 # Quick start
 
 ```{r "start", message=FALSE, warning=FALSE}
@@ -113,15 +121,15 @@ First, we filter out non-expressed genes. For simplicity, we remove those genes 
 filter <- rowMeans(assay(airway)) >= 10
 table(filter)
 
-raw <- assay(airway)[filter,]
+se <- airway[filter,]
 ```
 
 We are left with `r sum(filter)` genes. We are now ready to apply `awst` to the data.
 
 ```{r raw_awst}
-res_awst <- awst(raw)
-
-plot(density(res_awst[1,]), main = "Sample 1")
+se <- awst(se)
+se
+plot(density(assay(se, "awst")[,1]), main = "Sample 1")
 ```
 
 We can see that the majority of the values have been shrunk around −2, while the others values gradually increase up to around 4. The effect of reducing the contribution of lowly expressed genes, and of the winsorization for the highly expressed ones, results in a better separation of the samples, reflecting biological differences `r Citep(bib[["awst"]])`.
@@ -129,7 +137,7 @@ We can see that the majority of the values have been shrunk around −2, while t
 The other main function of the `r Biocpkg("awst")` package is `gene_filter`. It can be used to remove those genes that contribute little to nothing to the distance between samples. The function uses an entropy measure to remove the uninformative genes.
 
 ```{r genefilter}
-filtered <- gene_filter(res_awst)
+filtered <- gene_filter(se)
 dim(filtered)
 ```
 
@@ -138,7 +146,7 @@ Our final dataset is made of `r ncol(filtered)` genes.
 We can see how the `awst` transformation leads to separation between treatment (along PC1) and cell line (along PC2).
 
 ```{r pca}
-res_pca <- prcomp(res_awst)
+res_pca <- prcomp(t(assay(filtered, "awst")))
 df <- as.data.frame(cbind(res_pca$x, colData(airway)))
 ggplot(df, aes(x = PC1, y = PC2, color = dex, shape = cell)) +
     geom_point() + theme_classic()
@@ -151,10 +159,10 @@ Although in this example `awst` applied to raw data works well, a prior normaliz
 Here we show the results of `awst` after full-quantile normalization (implemented in `r Biocpkg("EDASeq")`).
 
 ```{r full}
-fq <- betweenLaneNormalization(raw, which="full")
-res_full <- awst(fq)
+assay(se, "fq") <- betweenLaneNormalization(assay(se), which="full")
+se <- awst(se, expr_values = "fq")
 
-res_pca <- prcomp(res_full)
+res_pca <- prcomp(t(assay(se, "awst")))
 df <- as.data.frame(cbind(res_pca$x, colData(airway)))
 ggplot(df, aes(x = PC1, y = PC2, color = dex, shape = cell)) +
     geom_point() + theme_classic()
