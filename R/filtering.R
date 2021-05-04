@@ -37,16 +37,13 @@ setGeneric("gene_filter", function(x, ...) standardGeneric("gene_filter"))
 
 #' @describeIn gene_filter the input is a matrix of awst-transformed values.
 #' @export
-setMethod("gene_filter", "matrix",
-          function(x, from = min(x, na.rm = TRUE),
-                   to = max(x, na.rm = TRUE),
-                   nBins = 20, heterogeneity_threshold = 0.1) {
+setMethod("gene_filter", "matrix", function(x, from = min(x, na.rm = TRUE),
+    to = max(x, na.rm = TRUE), nBins = 20, heterogeneity_threshold = 0.1) {
 
-              noisy_features <- get_noisy_features(x = x, from = from, to = to,
-                            nBins = nBins,
-                            heterogeneity_threshold = heterogeneity_threshold)
-              ans <- x[-noisy_features, ]
-              return(ans)
+    noisy_features <- get_noisy_features(x = x, from = from, to = to,
+        nBins = nBins, heterogeneity_threshold = heterogeneity_threshold)
+    ans <- x[-noisy_features, ]
+    return(ans)
 })
 
 #' @export
@@ -55,18 +52,15 @@ setMethod("gene_filter", "matrix",
 #'   awst-transformed values in one of its assays.
 #' @param awst_values integer scalar or string indicating the assay that
 #'   contains the awst-transformed values to use as input.
-setMethod("gene_filter", "SummarizedExperiment",
-          function(x, from = min(assay(x, awst_values), na.rm = TRUE),
-                   to = max(assay(x, awst_values), na.rm = TRUE),
-                   nBins = 20, heterogeneity_threshold = 0.1,
-                   awst_values = "awst") {
+setMethod("gene_filter", "SummarizedExperiment", function(x, from = min(assay(x,
+    awst_values), na.rm = TRUE), to = max(assay(x, awst_values), na.rm = TRUE),
+    nBins = 20, heterogeneity_threshold = 0.1, awst_values = "awst") {
 
-              noisy_features <- get_noisy_features(x = assay(x, awst_values),
-                            from = from, to = to,
-                            nBins = nBins,
-                            heterogeneity_threshold = heterogeneity_threshold)
+    noisy_features <- get_noisy_features(x = assay(x, awst_values), from = from,
+        to = to, nBins = nBins,
+        heterogeneity_threshold = heterogeneity_threshold)
 
-              return(x[-noisy_features,])
+    return(x[-noisy_features, ])
 
 })
 
@@ -82,8 +76,8 @@ get_noisy_features <- function(x, from, to, nBins, heterogeneity_threshold) {
     colnames(ttable) <- classes
     rownames(ttable) <- rownames(x)
 
-    for(k in seq_len(nrow(ddata_cut))) {
-        tt <- table(ddata_cut[k,])
+    for (k in seq_len(nrow(ddata_cut))) {
+        tt <- table(ddata_cut[k, ])
         ttable[k, names(tt)] <- tt
     }
 

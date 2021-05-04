@@ -45,20 +45,14 @@ setGeneric("awst", function(x, ...) standardGeneric("awst"))
 
 #' @export
 #' @describeIn awst the input is a matrix of (possibly normalized) counts
-setMethod("awst", "matrix",
-          function(x,
-                   poscount = FALSE,
-                   full_quantile = FALSE,
-                   sigma0 = 0.075,
-                   lambda = 13) {
+setMethod("awst", "matrix", function(x, poscount = FALSE, full_quantile = FALSE,
+    sigma0 = 0.075, lambda = 13) {
 
-              zcount <- score(x, poscount = poscount,
-                              full_quantile = full_quantile)
-              retval <- ssmooth(zcount, sigma0 = sigma0, lambda = lambda)
+    zcount <- score(x, poscount = poscount, full_quantile = full_quantile)
+    retval <- ssmooth(zcount, sigma0 = sigma0, lambda = lambda)
 
-              return(t(retval))
-          }
-)
+    return(t(retval))
+})
 
 #' @export
 #' @import SummarizedExperiment
@@ -68,40 +62,31 @@ setMethod("awst", "matrix",
 #'   contains the matrix to use as input.
 #' @param name string specifying the name of the assay to be used to store the
 #'   results of the transformation.
-setMethod("awst", "SummarizedExperiment",
-          function(x,
-                   poscount = FALSE,
-                   full_quantile = FALSE,
-                   sigma0 = 0.075,
-                   lambda = 13,
-                   expr_values = "counts",
-                   name = "awst") {
+setMethod("awst", "SummarizedExperiment", function(x, poscount = FALSE,
+    full_quantile = FALSE, sigma0 = 0.075, lambda = 13, expr_values = "counts",
+    name = "awst") {
 
-              assay(x, name) <- awst(assay(x, expr_values),
-                                     poscount = poscount,
-                                     full_quantile = full_quantile,
-                                     sigma0 = sigma0,
-                                     lambda = lambda)
+    assay(x, name) <- awst(assay(x, expr_values), poscount = poscount,
+        full_quantile = full_quantile, sigma0 = sigma0, lambda = lambda)
 
-              return(x)
-          }
-)
+    return(x)
+})
 
 #' @importFrom stats approxfun cov density dnorm integrate pnorm qnorm
 #'    quantile sd var
 score <- function(x, poscount = FALSE, full_quantile = FALSE) {
 
-    if(full_quantile) {
+    if (full_quantile) {
 
-        ccenter <- .compute_center(x[,1], poscount = poscount)
-        tau <- .compute_tau(x[,1], ccenter, poscount = poscount)
+        ccenter <- .compute_center(x[, 1], poscount = poscount)
+        tau <- .compute_tau(x[, 1], ccenter, poscount = poscount)
         retval <- t((x - exp(ccenter))/tau)
 
     } else {
 
         ccenter <- apply(x, 2, .compute_center, poscount = poscount)
         tau <- lapply(seq_len(NCOL(x)), function(i) {
-            .compute_tau(x[,i], ccenter[i], poscount = poscount)
+            .compute_tau(x[, i], ccenter[i], poscount = poscount)
         })
         tau <- simplify2array(tau)
 
@@ -115,13 +100,14 @@ score <- function(x, poscount = FALSE, full_quantile = FALSE) {
 
 ssmooth <- function(zcount, sigma0 = 0.075, lambda = 13) {
     ### distribution
-    ssigma <- function(z) return(1 + ifelse(z > 0, 2*lambda*(pnorm(z)-.5), 0))
-    foo <- function(z, sigma = sigma0)  return(dnorm(z, sd = sigma * ssigma(z)))
+    ssigma <- function(z) return(1 + ifelse(z > 0, 2 * lambda *
+        (pnorm(z) - 0.5), 0))
+    foo <- function(z, sigma = sigma0) return(dnorm(z, sd = sigma * ssigma(z)))
     (tmp <- integrate(foo, -Inf, Inf)$value)
     xx <- seq(from = -1, to = 10, length.out = 10000)
     yy <- foo(xx)
-    YY <- cumsum(yy[seq_len(length(xx)-1)]*(xx[seq_len(length(xx))[-1]] -
-                                                xx[seq_len(length(xx)-1)]))
+    YY <- cumsum(yy[seq_len(length(xx) - 1)] * (xx[seq_len(length(xx))[-1]] -
+        xx[seq_len(length(xx) - 1)]))
     YY <- YY/tmp
     YY[YY > 1] <- 1
 
@@ -139,8 +125,8 @@ ssmooth <- function(zcount, sigma0 = 0.075, lambda = 13) {
 
 .compute_center <- function(x, poscount = FALSE, n = 1000) {
 
-    if(poscount) {
-        wd <- log1p(x[x>0])
+    if (poscount) {
+        wd <- log1p(x[x > 0])
     } else {
         wd <- log1p(x)
     }
@@ -152,8 +138,8 @@ ssmooth <- function(zcount, sigma0 = 0.075, lambda = 13) {
 
 .compute_tau <- function(x, ccenter, poscount = FALSE) {
 
-    if(poscount) {
-        wd <- log1p(x[x>0])
+    if (poscount) {
+        wd <- log1p(x[x > 0])
     } else {
         wd <- log1p(x)
     }
@@ -162,5 +148,5 @@ ssmooth <- function(zcount, sigma0 = 0.075, lambda = 13) {
     tmp <- wd[wd > 0]
     tmp <- c(tmp, -tmp)
     sigma2 <- var(tmp)
-    tau <- sqrt((exp(sigma2) - 1) * exp(2*ccenter + sigma2))
+    tau <- sqrt((exp(sigma2) - 1) * exp(2 * ccenter + sigma2))
 }
