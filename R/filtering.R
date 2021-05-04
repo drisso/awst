@@ -43,8 +43,8 @@ setMethod("gene_filter", "matrix",
                    nBins = 20, heterogeneity_threshold = 0.1) {
 
               noisy_features <- get_noisy_features(x = x, from = from, to = to,
-                                                   nBins = nBins,
-                                                   heterogeneity_threshold = heterogeneity_threshold)
+                            nBins = nBins,
+                            heterogeneity_threshold = heterogeneity_threshold)
               ans <- x[-noisy_features, ]
               return(ans)
 })
@@ -62,9 +62,9 @@ setMethod("gene_filter", "SummarizedExperiment",
                    awst_values = "awst") {
 
               noisy_features <- get_noisy_features(x = assay(x, awst_values),
-                                                   from = from, to = to,
-                                                   nBins = nBins,
-                                                   heterogeneity_threshold = heterogeneity_threshold)
+                            from = from, to = to,
+                            nBins = nBins,
+                            heterogeneity_threshold = heterogeneity_threshold)
 
               return(x[-noisy_features,])
 
@@ -93,7 +93,8 @@ get_noisy_features <- function(x, from, to, nBins, heterogeneity_threshold) {
 
 heterogeneity <- function(empirical_probabilities, nBins = nBins) {
     # Shannon's entropy
-    empirical_probabilities <- empirical_probabilities/sum(empirical_probabilities)
+    empirical_probabilities <- empirical_probabilities /
+        sum(empirical_probabilities)
     empirical_probabilities[empirical_probabilities == 0] <- 1
     ans <- -sum(empirical_probabilities * log2(empirical_probabilities))
     ans <- ans/log2(nBins)

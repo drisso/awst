@@ -52,11 +52,13 @@ setMethod("awst", "matrix",
                    sigma0 = 0.075,
                    lambda = 13) {
 
-              zcount <- score(x, poscount = poscount, full_quantile = full_quantile)
+              zcount <- score(x, poscount = poscount,
+                              full_quantile = full_quantile)
               retval <- ssmooth(zcount, sigma0 = sigma0, lambda = lambda)
 
               return(t(retval))
-})
+          }
+)
 
 #' @export
 #' @import SummarizedExperiment
@@ -82,7 +84,8 @@ setMethod("awst", "SummarizedExperiment",
                                      lambda = lambda)
 
               return(x)
-})
+          }
+)
 
 #' @importFrom stats approxfun cov density dnorm integrate pnorm qnorm
 #'    quantile sd var
