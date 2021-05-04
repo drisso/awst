@@ -13,9 +13,14 @@ Authors@R:
                email = "smpagnotta@gmail.com",
                comment = c(ORCID = "0000-0002-8298-9777")))
 Description:
-    We propose an Asymmetric Within-Sample Transformation (AWST) 
+    We propose an Asymmetric Within-Sample Transformation (AWST)
     to regularize RNA-seq read counts and reduce the effect of noise
-    on the classification of samples.
+    on the classification of samples. AWST comprises two main steps:
+    standardization and smoothing. These steps transform gene expression data to
+    reduce the noise of the lowly expressed features, which suffer from
+    background effects and low signal-to-noise ratio, and the influence of the
+    highly expressed features, which may be the result of amplification bias
+    and other experimental artifacts.
 License: MIT + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.1.1
