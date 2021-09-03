@@ -40,9 +40,9 @@ setGeneric("gene_filter", function(x, ...) standardGeneric("gene_filter"))
 setMethod("gene_filter", "matrix", function(x, from = min(x, na.rm = TRUE),
     to = max(x, na.rm = TRUE), nBins = 20, heterogeneity_threshold = 0.1) {
 
-    noisy_features <- get_noisy_features(x = x, from = from, to = to,
+    informative_features <- get_informative_features(x = x, from = from, to = to,
         nBins = nBins, heterogeneity_threshold = heterogeneity_threshold)
-    ans <- x[-noisy_features, ]
+    ans <- x[informative_features, , drop = FALSE]
     return(ans)
 })
 
@@ -56,15 +56,15 @@ setMethod("gene_filter", "SummarizedExperiment", function(x, from = min(assay(x,
     awst_values), na.rm = TRUE), to = max(assay(x, awst_values), na.rm = TRUE),
     nBins = 20, heterogeneity_threshold = 0.1, awst_values = "awst") {
 
-    noisy_features <- get_noisy_features(x = assay(x, awst_values), from = from,
+    informative_features <- get_informative_features(x = assay(x, awst_values), from = from,
         to = to, nBins = nBins,
         heterogeneity_threshold = heterogeneity_threshold)
 
-    return(x[-noisy_features, ])
+    return(x[informative_features, , drop=FALSE])
 
 })
 
-get_noisy_features <- function(x, from, to, nBins, heterogeneity_threshold) {
+get_informative_features <- function(x, from, to, nBins, heterogeneity_threshold) {
 
     bbreaks <- seq(from = from, to = to, length.out = nBins + 1)
     classes <- levels(cut(x[, 1], breaks = bbreaks, include.lowest = TRUE))
@@ -82,7 +82,7 @@ get_noisy_features <- function(x, from, to, nBins, heterogeneity_threshold) {
     }
 
     tmp <- apply(ttable, 1, heterogeneity, nBins = nBins)
-    return(which(tmp < heterogeneity_threshold))
+    return(which(tmp >= heterogeneity_threshold))
 }
 
 heterogeneity <- function(empirical_probabilities, nBins = nBins) {

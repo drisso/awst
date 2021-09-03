@@ -64,3 +64,9 @@ test_that("SummarizedExperiment method works with non-default assays", {
 
     expect_equal(assay(se, "awst"), assay(se, "awst2"))
 })
+
+test_that("gene_filter limit cases work", {
+    x <- t(matrix(rpois(25, lambda=5), ncol=5, nrow=5))
+    expect_equal(gene_filter(x), x)
+    expect_equal(nrow(gene_filter(x, heterogeneity_threshold = 1)), 0)
+})
