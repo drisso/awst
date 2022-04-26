@@ -1,6 +1,6 @@
 Package: awst
 Title: Asymmetric Within-Sample Transformation
-Version: 1.4.0
+Version: 1.5.0
 Authors@R: 
     c(person(given = "Davide",
                 family = "Risso",
