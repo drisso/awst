@@ -131,7 +131,7 @@ ssmooth <- function(zcount, sigma0 = 0.075, lambda = 13) {
         wd <- log1p(x)
     }
 
-    d <- density(wd, n = n)
+    d <- density(wd, n = n, old.coords = TRUE)
     ccenter <- (d$x[d$x > 1])[which.max(d$y[d$x > 1])]
     return(ccenter)
 }
